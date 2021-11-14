@@ -11,6 +11,7 @@ const port = process.argv.length > 3 ? process.argv[3] : 8080;
 const mediaTypes = {
   png: 'image/png',
   html: 'text/html',
+  css: 'text/css',
 };
 
 const server = http.createServer(function(request, response) {
