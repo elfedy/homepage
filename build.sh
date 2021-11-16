@@ -8,7 +8,7 @@ mkdir build
 
 echo starting build..
 
-cp src/*.html build/
+node build_pages.js
 npx postcss src/css/index.css > build/index.css
 
 echo built successfully
