@@ -16,7 +16,16 @@ const mediaTypes = {
 
 const server = http.createServer(function(request, response) {
   console.log(request.method + ' ' + request.url);
-  const filepath = path.join(publicFolder, request.url);
+  let file = request.url;
+  let ext = path.extname(file);
+
+  // Default to an .html file if no extension is provided in the url
+  // (To simulate what happens in production)
+  if(ext.length === 0) {
+    ext = '.html';
+    file = file + ext;
+  }
+  const filepath = path.join(publicFolder, file);
 
   fs.readFile(filepath, function(err, data) {
     if(err) {
@@ -25,7 +34,6 @@ const server = http.createServer(function(request, response) {
     }
 
     let mediaType = 'text/html';
-    const ext = path.extname(filepath)
     if(ext.length > 0 && mediaTypes.hasOwnProperty(ext.slice(1))) {
       mediaType = mediaTypes[ext.slice(1)];
     }
