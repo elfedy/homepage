@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300|PT+Sans"
+      rel="stylesheet">
+    <!-- Use the title from a page's frontmatter if it has one -->
+    <title>Testing Custom Form Helpers in Phoenix</title>
+    <link href="/stylesheets/site.css" rel="stylesheet" />
+    <link href="/stylesheets/highlighting.css" rel="stylesheet" />
+    <script src="/javascripts/site.js"></script>
+  </head>
+
+  <body>
+    <div class="container container__main">
+      <header class="header">
+  <div class="header__wrapper">
+    <div class="header__image-container">
+      <img src="/images/Fede.png" class="header__image" alt="Fede" />
+    </div>
+
+    <div class="header__body">
+      <p>
+      I am Federico Rodríguez. I write about programming.
+      </p>
+      <ul class="header__links">
+        <li>
+          <a class="header__link" href="mailto: elfedyrodriguez@gmail.com">
+            <img src="/images/email.svg" class="header__icon header-icon--email" alt="Email" />
+        </a>
+        </li>
+        <li>
+          <a class="header__link" target="_blank" href="https://twitter.com/elfedyrodriguez">
+            <img src="/images/twitter.svg" class="header__icon header-icon--twitter" alt="Twitter" />
+        </a>
+        </li>
+      </ul>
+    </div>
+</header>
+
+      <div class="container container__body">
+        <div class="container__article">
+          <article itemscope itemtype="http://schema.org/BlogPosting">
+            <a href="/" class="article__back-to-index">Back to index</a>
+            <time class="article__date" itemprop="datePublished">2018 Mar 31</time>
+            <h2 itemprop="name headline">Testing Custom Form Helpers in Phoenix</h2>
+            <div itemprop="articleBody">
+              <p>I found this <a href="http://blog.plataformatec.com.br/2016/09/dynamic-forms-with-phoenix/">great article by Jose Valim</a> where he talks about building custom form helpers in Phoenix. I consider these kind of helpers to be a great place to add unit tests. The reason for this is that they are often used in many places and lots of edge cases/customizations may come up. As we progress on building an application, we risk breaking old functionality when we introduce new one. Unit tests will let us quickly check that everything is working as expected.</p>
+
+<p>This article shows how to write some simple unit tests for functions that work with forms. This is also a good way to expose one of the things that I like the most about Phoenix: everything that&rsquo;s part of the framework feels very composable and its easy to understand how it works. Therefore, isolating and testing every element of our application becomes quite simple. </p>
+
+<h2>The original code</h2>
+
+<p>We will be testing the function from the article that generates the same markup as a Phoenix generator:</p>
+<div class="highlight"><pre class="highlight elixir"><code><span class="k">defmodule</span> <span class="no">TestingFormHelpers</span><span class="o">.</span><span class="no">InputHelpers</span> <span class="k">do</span>
+  <span class="kn">use</span> <span class="no">Phoenix</span><span class="o">.</span><span class="no">HTML</span>
+
+  <span class="k">def</span> <span class="n">input</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">type</span> <span class="o">=</span> <span class="no">Phoenix</span><span class="o">.</span><span class="no">HTML</span><span class="o">.</span><span class="no">Form</span><span class="o">.</span><span class="n">input_type</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+
+    <span class="n">wrapper_opts</span> <span class="o">=</span> <span class="p">[</span><span class="ss">class:</span> <span class="sd">"</span><span class="s2">form-group"</span><span class="p">]</span>
+    <span class="n">label_opts</span> <span class="o">=</span> <span class="p">[</span><span class="ss">class:</span> <span class="sd">"</span><span class="s2">control-label"</span><span class="p">]</span>
+    <span class="n">input_opts</span> <span class="o">=</span> <span class="p">[</span><span class="ss">class:</span> <span class="sd">"</span><span class="s2">form-control"</span><span class="p">]</span>
+
+    <span class="n">content_tag</span> <span class="ss">:div</span><span class="p">,</span> <span class="n">wrapper_opts</span> <span class="k">do</span>
+      <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">humanize</span><span class="p">(</span><span class="n">field</span><span class="p">),</span> <span class="n">label_opts</span><span class="p">)</span>
+      <span class="n">input</span> <span class="o">=</span> 
+        <span class="n">apply</span><span class="p">(</span>
+          <span class="no">Phoenix</span><span class="o">.</span><span class="no">HTML</span><span class="o">.</span><span class="no">Form</span><span class="p">,</span> 
+          <span class="n">type</span><span class="p">,</span> 
+          <span class="p">[</span><span class="n">form</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">input_opts</span><span class="p">]</span>
+      <span class="p">)</span>
+      <span class="n">error</span> <span class="o">=</span> 
+        <span class="no">TestingFormHelpersWeb</span><span class="o">.</span><span class="no">ErrorHelpers</span><span class="o">.</span><span class="n">error_tag</span><span class="p">(</span>
+          <span class="n">form</span><span class="p">,</span> 
+          <span class="n">field</span>
+        <span class="p">)</span> <span class="o">||</span> <span class="sd">"</span><span class="s2">"</span>
+
+      <span class="p">[</span><span class="n">label</span><span class="p">,</span> <span class="n">input</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>When called inside a form, which is passesd as the first argument of the function, this helper turns this:</p>
+<div class="highlight"><pre class="highlight plaintext"><code>input f, :field_name
+</code></pre></div>
+<p>into this:</p>
+<div class="highlight"><pre class="highlight plaintext"><code>&lt;div class="form-group"&gt;
+  &lt;%= label f, :field_name, class: "control-label" %&gt;
+  &lt;%= text_input f, :field_name, class: "form-control" %&gt;
+  &lt;%= error_tag f, :field_name %&gt;
+&lt;/div&gt;
+</code></pre></div>
+<h2>Writing the tests</h2>
+
+<p>In order to test our function, we need a <code>%Phoenix.HTML.Form{}</code> struct to pass as a first argument to the function. We can create one using <a href="https://hexdocs.pm/phoenix_html/Phoenix.HTML.FormData.html#to_form/2">Phoenix.HTML.FormData.to_form/2</a>, this transforms a struct that complies with the <code>FormData</code> protocol into a form struct. In Phoenix, there are two structs that comply with this protocol: <code>Plug.Conn</code> and <code>Ecto.Changeset</code>.</p>
+
+<p>Let&rsquo;s use a changeset as it is what we will generally be using in forms. To build one, we can use a mock schema module defined inside the same test module or in a new file, for example <code>test/support/some_schema.ex</code>.</p>
+<div class="highlight"><pre class="highlight elixir"><code><span class="k">defmodule</span> <span class="no">TestingFormHelpers</span><span class="o">.</span><span class="no">SomeSchema</span> <span class="k">do</span>
+  <span class="kn">use</span> <span class="no">Ecto</span><span class="o">.</span><span class="no">Schema</span>
+
+  <span class="n">schema</span> <span class="sd">"</span><span class="s2">some_schemas"</span> <span class="k">do</span>
+    <span class="n">field</span><span class="p">(</span><span class="ss">:some_field</span><span class="p">,</span> <span class="ss">:string</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>Inside the test, we use <code>Ecto.Changeset.cast</code>, pass it to the <code>to_form\2</code> function and invoke the genereted html as a string to assert the values are being created correctly.</p>
+<div class="highlight"><pre class="highlight elixir"><code><span class="k">defmodule</span> <span class="no">TestingFormHelpers</span><span class="o">.</span><span class="no">InputHelpersTest</span> <span class="k">do</span>
+  <span class="kn">use</span> <span class="no">ExUnit</span><span class="o">.</span><span class="no">Case</span>
+  <span class="n">alias</span> <span class="no">TestingFormHelpers</span><span class="o">.</span><span class="no">InputHelpers</span>
+
+  <span class="n">test</span> <span class="sd">"</span><span class="s2">renders text input with phoenix-generator-style wrappers"</span> <span class="k">do</span>
+    <span class="n">changeset</span> <span class="o">=</span>
+      <span class="no">Ecto</span><span class="o">.</span><span class="no">Changeset</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span>
+        <span class="p">%</span><span class="no">TestingFormHelpers</span><span class="o">.</span><span class="no">SomeSchema</span><span class="p">{},</span> 
+        <span class="p">%{</span><span class="ss">some_field:</span> <span class="sd">"</span><span class="s2">Some Value"</span><span class="p">},</span> 
+        <span class="p">[</span><span class="ss">:some_field</span><span class="p">]</span>
+      <span class="p">)</span>
+
+    <span class="n">form</span> <span class="o">=</span> <span class="no">Phoenix</span><span class="o">.</span><span class="no">HTML</span><span class="o">.</span><span class="no">FormData</span><span class="o">.</span><span class="n">to_form</span><span class="p">(</span><span class="n">changeset</span><span class="p">,</span> <span class="p">[])</span>
+
+    <span class="n">html</span> <span class="o">=</span> 
+      <span class="no">Phoenix</span><span class="o">.</span><span class="no">HTML</span><span class="o">.</span><span class="n">safe_to_string</span><span class="p">(</span>
+        <span class="no">InputHelpers</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="ss">:some_field</span><span class="p">)</span>
+      <span class="p">)</span>
+
+    <span class="n">assert</span><span class="p">(</span><span class="n">html</span> <span class="o">=~</span> <span class="sd">"</span><span class="s2">&lt;div class=\"</span><span class="n">form</span><span class="o">-</span><span class="n">group</span><span class="p">\</span><span class="sd">"</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">html</span> <span class="o">=~</span> <span class="sd">"</span><span class="s2">&lt;label class=\"</span><span class="n">control</span><span class="o">-</span><span class="n">label</span><span class="p">\</span><span class="sd">"</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">html</span> <span class="o">=~</span> <span class="sd">"</span><span class="s2">&lt;input class=\"</span><span class="n">form</span><span class="o">-</span><span class="n">control</span><span class="p">\</span><span class="sd">"</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">html</span> <span class="o">=~</span> <span class="sd">"</span><span class="s2">type=\"</span><span class="n">text</span><span class="p">\</span><span class="sd">"</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">html</span> <span class="o">=~</span> <span class="sd">"</span><span class="s2">name=\"</span><span class="n">some_schema</span><span class="p">[</span><span class="n">some_field</span><span class="p">]\</span><span class="sd">"</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">html</span> <span class="o">=~</span> <span class="sd">"</span><span class="s2">value=\"</span><span class="no">Some</span> <span class="no">Value</span><span class="p">\</span><span class="sd">"</span><span class="s2">"</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>We can also test that when the changeset has errors, the correct error message is shown. Keep in mind that in order for the form object to show the errors, the changeset we are transforming into a form struct needs to have an action applied to it. That is why we are using <code>Ecto.Changeset.apply_action/2</code>.</p>
+<div class="highlight"><pre class="highlight elixir"><code><span class="n">test</span> <span class="sd">"</span><span class="s2">renders errors correctly"</span> <span class="k">do</span>
+  <span class="p">{</span><span class="ss">:error</span><span class="p">,</span> <span class="n">changeset</span><span class="p">}</span> <span class="o">=</span>
+    <span class="no">Ecto</span><span class="o">.</span><span class="no">Changeset</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span>
+      <span class="p">%</span><span class="no">TestingFormHelpers</span><span class="o">.</span><span class="no">SomeSchema</span><span class="p">{},</span> 
+      <span class="p">%{</span><span class="ss">some_field:</span> <span class="sd">"</span><span class="s2">Some Value"</span><span class="p">},</span> 
+      <span class="p">[</span><span class="ss">:some_field</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="o">|&gt;</span> <span class="no">Ecto</span><span class="o">.</span><span class="no">Changeset</span><span class="o">.</span><span class="n">validate_length</span><span class="p">(</span><span class="ss">:some_field</span><span class="p">,</span> <span class="ss">max:</span> <span class="m">3</span><span class="p">)</span>
+    <span class="o">|&gt;</span> <span class="no">Ecto</span><span class="o">.</span><span class="no">Changeset</span><span class="o">.</span><span class="n">apply_action</span><span class="p">(</span><span class="ss">:insert</span><span class="p">)</span>
+
+  <span class="n">form</span> <span class="o">=</span> <span class="no">Phoenix</span><span class="o">.</span><span class="no">HTML</span><span class="o">.</span><span class="no">FormData</span><span class="o">.</span><span class="n">to_form</span><span class="p">(</span><span class="n">changeset</span><span class="p">,</span> <span class="p">[])</span>
+
+  <span class="n">html</span> <span class="o">=</span> 
+    <span class="no">Phoenix</span><span class="o">.</span><span class="no">HTML</span><span class="o">.</span><span class="n">safe_to_string</span><span class="p">(</span>
+      <span class="no">InputHelpers</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="ss">:some_field</span><span class="p">)</span>
+    <span class="p">)</span>
+
+  <span class="n">assert</span><span class="p">(</span><span class="n">html</span> <span class="o">=~</span> <span class="sd">"</span><span class="s2">should be at most 3 character(s)"</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></div>
+            </div>
+          </article>
+        </div>
+        <div class="container__bottom-navigation">
+            <a href="/2018/02/19/asynchronous-programming-part-2.html" class="bottom-navigation__previous">
+              <div class="bottom-navigation__arrow"><</div>
+              <div>An introduction to JavaScript Asynchronous Programming - Part 2 | DOM Events</div>
+            </a>
+            <a href="/2018/07/09/store-url-and-friendly-redirect-in-phoenix.html" class="bottom-navigation__next">
+              <div>Storing previous urls and doing friendly redirects in phoenix</div>
+              <div class="bottom-navigation__arrow">></div>
+            </a>
+        </div>
+    </div>
+  </body>
+</html>

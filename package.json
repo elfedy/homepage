@@ -12,6 +12,7 @@
     "autoprefixer": "^10.4.0",
     "chokidar": "^3.5.2",
     "cssnano": "^5.0.10",
+    "marked": "^4.0.3",
     "mustache": "^4.2.0",
     "postcss-cli": "^9.0.2",
     "postcss-nested": "^5.0.6"

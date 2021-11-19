@@ -5,6 +5,7 @@ set -o pipefail
 
 rm -rf build
 mkdir build
+mkdir build/articles
 
 echo starting build..
 
