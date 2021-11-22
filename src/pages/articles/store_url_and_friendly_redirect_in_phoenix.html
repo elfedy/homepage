@@ -1,54 +1,4 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300|PT+Sans"
-      rel="stylesheet">
-    <!-- Use the title from a page's frontmatter if it has one -->
-    <title>Storing previous urls and doing friendly redirects in phoenix</title>
-    <link href="/stylesheets/site.css" rel="stylesheet" />
-    <link href="/stylesheets/highlighting.css" rel="stylesheet" />
-    <script src="/javascripts/site.js"></script>
-  </head>
-
-  <body>
-    <div class="container container__main">
-      <header class="header">
-  <div class="header__wrapper">
-    <div class="header__image-container">
-      <img src="/images/Fede.png" class="header__image" alt="Fede" />
-    </div>
-
-    <div class="header__body">
-      <p>
-      I am Federico Rodríguez. I write about programming.
-      </p>
-      <ul class="header__links">
-        <li>
-          <a class="header__link" href="mailto: elfedyrodriguez@gmail.com">
-            <img src="/images/email.svg" class="header__icon header-icon--email" alt="Email" />
-        </a>
-        </li>
-        <li>
-          <a class="header__link" target="_blank" href="https://twitter.com/elfedyrodriguez">
-            <img src="/images/twitter.svg" class="header__icon header-icon--twitter" alt="Twitter" />
-        </a>
-        </li>
-      </ul>
-    </div>
-</header>
-
-      <div class="container container__body">
-        <div class="container__article">
-          <article itemscope itemtype="http://schema.org/BlogPosting">
-            <a href="/" class="article__back-to-index">Back to index</a>
-            <time class="article__date" itemprop="datePublished">2018 Jul  9</time>
-            <h2 itemprop="name headline">Storing previous urls and doing friendly redirects in phoenix</h2>
-            <div itemprop="articleBody">
-              <p>When we have an applcation with authorization/authentication functionality in place, there are some cases when we may want redirect a user to the url he was previously visiting before logging in. This article shows how use plugs to achieve that in Phoenix.</p>
+<p>When we have an applcation with authorization/authentication functionality in place, there are some cases when we may want redirect a user to the url he was previously visiting before logging in. This article shows how use plugs to achieve that in Phoenix.</p>
 
 <h2>Strategy</h2>
 
@@ -62,81 +12,122 @@
 <h2>Storing url in a session</h2>
 
 <p>We want to store the url of every get request that is not related to creating a new user or a new session. For this example we will asume we have REST <code>user</code>, <code>session</code> and <code>password_reset</code> routes, such as the ones used by the <a href="https://github.com/riverrun/phauxth">phauxth</a> library. In this case, we would like to avoid storing the following routes:</p>
-<div class="highlight"><pre class="highlight plaintext"><code>GET     /users/new           
-GET     /sessions/new       
-GET     /password_resets/new
-GET     /password_resets/edit
-</code></pre></div>
+
+<pre>
+  <code class="language-elixir">
+    defmodule MyApp.FriendlyRedirect do
+      import Plug.Conn
+
+      def store_path_in_session(conn, _) do
+        # Get HTTP method and url from conn
+        method = conn.method
+        path = conn.request_path
+
+        # If conditions apply store path in session, else return conn unmodified 
+        case {method, storable?(path)} do
+          {"GET", true} -&gt;
+            put_session(conn, :firendly_redirect_path, path)
+      
+          {_, _} -&gt;
+            conn
+        end
+      end
+
+      defp storable?(path) do
+        !(url =~ r/user|session|password_resets/)
+      end
+    end
+  </code>
+</pre>
+
+<pre>
+  <code>
+    GET     /sessions/new       
+    GET     /password_resets/new
+    GET     /password_resets/edit
+  </code>
+</pre>
+
 <p>For storing the url we are going to use session storage. Session storage only stores data until user closes the tab he is currently browsing. This makes the most sense for our use case as we do not want the user to log in and get redirected to a page he may have visited some days ago.</p>
 
 <p>With all this in mind, we could write a <code>FriendlyRedirect</code> module that exposes <code>store_path_in_session/2</code> to act as a plug. In order to do that, the function needs to take a <code>%Plug.Conn{}</code> struct and an options variable as arguments, and return another <code>Plug.Conn{}</code> struct, to be passed to the next plug in the pipeline.</p>
-<div class="highlight"><pre class="highlight elixir"><code><span class="k">defmodule</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">FriendlyRedirect</span> <span class="k">do</span>
-  <span class="kn">import</span> <span class="no">Plug</span><span class="o">.</span><span class="no">Conn</span>
 
-  <span class="k">def</span> <span class="n">store_path_in_session</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="k">do</span>
-    <span class="c1"># Get HTTP method and url from conn</span>
-    <span class="n">method</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">method</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">request_path</span>
 
-    <span class="c1"># If conditions apply store path in session, else return conn unmodified </span>
-    <span class="k">case</span> <span class="p">{</span><span class="n">method</span><span class="p">,</span> <span class="n">storable?</span><span class="p">(</span><span class="n">path</span><span class="p">)}</span> <span class="k">do</span>
-      <span class="p">{</span><span class="sd">"</span><span class="s2">GET"</span><span class="p">,</span> <span class="no">true</span><span class="p">}</span> <span class="o">-&gt;</span>
-        <span class="n">put_session</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="ss">:firendly_redirect_path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+<pre>
+  <code class="language-elixir">
+    defmodule MyApp.FriendlyRedirect do
+      import Plug.Conn
 
-      <span class="p">{</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">}</span> <span class="o">-&gt;</span>
-        <span class="n">conn</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
+      def store_path_in_session(conn, _) do
+        # Get HTTP method and url from conn
+        method = conn.method
+        path = conn.request_path
 
-  <span class="k">defp</span> <span class="n">storable?</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">do</span>
-    <span class="n">!</span><span class="p">(</span><span class="n">url</span> <span class="o">=~</span> <span class="n">r</span><span class="o">/</span><span class="n">user</span><span class="o">|</span><span class="n">session</span><span class="o">|</span><span class="n">password_resets</span><span class="o">/</span><span class="p">)</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></div>
+        # If conditions apply store path in session, else return conn unmodified 
+        case {method, storable?(path)} do
+          {"GET", true} -&gt;
+            put_session(conn, :firendly_redirect_path, path)
+      
+          {_, _} -&gt;
+            conn
+        end
+      end
+
+      defp storable?(path) do
+        !(url =~ r/user|session|password_resets/)
+      end
+    end
+  </code>
+</pre>
 <p>We can make the module available in the router by importing it in its corresponding function in <code>lib/my_app.ex</code>.</p>
-<div class="highlight"><pre class="highlight elixir"><code><span class="k">def</span> <span class="n">router</span> <span class="k">do</span>
- <span class="kn">quote</span> <span class="k">do</span>
-     <span class="kn">use</span> <span class="no">Phoenix</span><span class="o">.</span><span class="no">Router</span>
-     <span class="kn">import</span> <span class="no">Plug</span><span class="o">.</span><span class="no">Conn</span>
-     <span class="kn">import</span> <span class="no">Phoenix</span><span class="o">.</span><span class="no">Controller</span>
-     <span class="kn">import</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">FriendlyRedirect</span>
- <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></div>
+
+<pre>
+  <code class="language-elixir">
+    def router do
+     quote do
+       use Phoenix.Router
+       import Plug.Conn
+       import Phoenix.Controller
+       import MyApp.FriendlyRedirect
+     end
+    end
+  </code>
+</pre>
 <p>We then call the <code>store_path_in_session/2</code> function as a plug in the <code>:browser</code> pipeline of our router.</p>
-<div class="highlight"><pre class="highlight elixir"><code><span class="n">pipeline</span> <span class="ss">:browser</span> <span class="k">do</span>
-  <span class="o">...</span>
-  <span class="n">plug</span><span class="p">(</span><span class="ss">:store_url_for_login_retargeting</span><span class="p">)</span>
-<span class="k">end</span>
-</code></pre></div>
+<pre>
+  <code class="language-elixir">
+    pipeline :browser do
+      ...
+      plug(:store_url_for_login_retargeting)
+    end
+  </code>
+</pre>
+
 <h2>Redirecting</h2>
 
 <p>Now that we are storing the url, we have to redirect to it when the signup is successful. Let&rsquo;s add a public method to our previously defined module that gets the stored path or gives a default if no stored path is found. </p>
-<div class="highlight"><pre class="highlight elixir"><code><span class="k">defmodule</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">FriendlyRedirect</span> <span class="k">do</span>
-  <span class="o">...</span>
-  <span class="k">def</span> <span class="n">target_path</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span> <span class="k">do</span>
-    <span class="n">target_path</span> <span class="o">=</span> 
-      <span class="n">get_session</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="ss">:login_retargeting_path</span><span class="p">)</span> <span class="o">||</span> 
-      <span class="n">default_retargeting_path</span>
-  <span class="k">end</span>
 
-  <span class="k">defp</span> <span class="n">default_retargeting_path</span> <span class="k">do</span>
-    <span class="sd">"</span><span class="s2">/"</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></div>
+<pre>
+  <code class="language-elixir">
+defmodule MyApp.FriendlyRedirect do
+  ...
+  def target_path(conn) do
+    target_path = 
+      get_session(conn, :login_retargeting_path) || 
+      default_retargeting_path
+  end
+
+  defp default_retargeting_path do
+    "/"
+  end
+end
+  </code>
+</pre>
+
 <p>Then on sign up/log in, we would redirect to that path inside the corresponding controller action:</p>
-<div class="highlight"><pre class="highlight elixir"><code><span class="n">redirect</span> <span class="n">conn</span><span class="p">,</span> <span class="ss">to:</span> <span class="no">FriendlyRedirect</span><span class="o">.</span><span class="n">target_path</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
-</code></pre></div>
-            </div>
-          </article>
-        </div>
-        <div class="container__bottom-navigation">
-            <a href="/2018/03/31/testing_custom_form_helpers_in_phoenix.html" class="bottom-navigation__previous">
-              <div class="bottom-navigation__arrow"><</div>
-              <div>Testing Custom Form Helpers in Phoenix</div>
-            </a>
-        </div>
-    </div>
-  </body>
-</html>
+
+<pre>
+  <code class="language-elixir">
+    redirect conn, to: FriendlyRedirect.target_path(conn)
+  </code>
+</pre>

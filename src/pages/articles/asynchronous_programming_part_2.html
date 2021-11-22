@@ -1,53 +1,4 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300|PT+Sans"
-      rel="stylesheet">
-    <!-- Use the title from a page's frontmatter if it has one -->
-    <title>An introduction to JavaScript Asynchronous Programming - Part 2 | DOM Events</title>
-    <link href="/stylesheets/site.css" rel="stylesheet" />
-    <script src="/javascripts/site.js"></script>
-  </head>
-
-  <body>
-    <div class="container container__main">
-      <header class="header">
-  <div class="header__wrapper">
-    <div class="header__image-container">
-      <img src="/images/Fede.png" class="header__image" alt="Fede" />
-    </div>
-
-    <div class="header__body">
-      <p>
-      I am Federico Rodríguez. I write about programming.
-      </p>
-      <ul class="header__links">
-        <li>
-          <a class="header__link" href="mailto: elfedyrodriguez@gmail.com">
-            <img src="/images/email.svg" class="header__icon header-icon--email" alt="Email" />
-        </a>
-        </li>
-        <li>
-          <a class="header__link" target="_blank" href="https://twitter.com/elfedyrodriguez">
-            <img src="/images/twitter.svg" class="header__icon header-icon--twitter" alt="Twitter" />
-        </a>
-        </li>
-      </ul>
-    </div>
-</header>
-
-      <div class="container container__body">
-        <div class="container__article">
-          <article itemscope itemtype="http://schema.org/BlogPosting">
-            <a href="/" class="article__back-to-index">Back to index</a>
-            <time class="article__date" itemprop="datePublished">2018 Feb 19</time>
-            <h2 itemprop="name headline">An introduction to JavaScript Asynchronous Programming - Part 2 | DOM Events</h2>
-            <div itemprop="articleBody">
-              <p><a href="/2017/10/02/asynchrounous-programming-part-1.html">Last time</a> we had fun with time functions. However, there are much more important and more powerful concepts related to asynchronous code. One of them is DOM Events.</p>
+<p><a href="/2017/10/02/asynchrounous-programming-part-1.html">Last time</a> we had fun with time functions. However, there are much more important and more powerful concepts related to asynchronous code. One of them is DOM Events.</p>
 
 <p>When using JS in the context of a Browser, we can be aware of lots of different things that happen during the user’s interaction with the web page. Most importantly, through the use of JS code, we have the ability to run code whenever an interaction or significant event happens.</p>
 
@@ -78,41 +29,45 @@
 <p>Although I will show most of the examples here, I recommend you to type them yourself into <code>.html</code> files and the running them using your favorite browser.</p>
 
 <p>We will start by creating buttons that change the color of a box.</p>
-<div class="highlight"><pre class="highlight html"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"box"</span><span class="nt">&gt;</span>
-<span class="nt">&lt;/div&gt;</span>
+<pre>
+  <code class="language-html">
+    &lt;div class="box"&gt;
+    &lt;/div&gt;
 
-<span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">"turn-red"</span><span class="nt">&gt;</span>Turn the box Red!<span class="nt">&lt;/button&gt;</span>
-<span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">"turn-blue"</span><span class="nt">&gt;</span>Turn the box Blue!<span class="nt">&lt;/button&gt;</span>
+    &lt;button class="turn-red"&gt;Turn the box Red!&lt;/button&gt;
+    &lt;button class="turn-blue"&gt;Turn the box Blue!&lt;/button&gt;
 
-<span class="nt">&lt;style&gt;</span>
-  <span class="nc">.box</span> <span class="p">{</span>
-    <span class="nl">height</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
-    <span class="nl">width</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
-    <span class="nl">margin</span><span class="p">:</span> <span class="m">10px</span><span class="p">;</span>
-    <span class="nl">background-color</span><span class="p">:</span> <span class="m">#000</span><span class="p">;</span>
-  <span class="p">}</span>
-<span class="nt">&lt;/style&gt;</span>
+    &lt;style&gt;
+      .box {
+        height: 100px;
+        width: 100px;
+        margin: 10px;
+        background-color: #000;
+      }
+    &lt;/style&gt;
 
-<span class="nt">&lt;script&gt;</span>
-  <span class="c1">// defining the callbacks here</span>
-  <span class="kd">const</span> <span class="nx">turnRed</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">box</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'.box'</span><span class="p">);</span>
-    <span class="nx">box</span><span class="p">.</span><span class="nx">style</span> <span class="o">=</span> <span class="s1">'background-color: red;'</span>
-  <span class="p">}</span>
+    &lt;script&gt;
+      // defining the callbacks here
+      const turnRed = () =&gt; {
+        box = document.querySelector('.box');
+        box.style = 'background-color: red;'
+      }
 
-  <span class="kd">const</span> <span class="nx">turnBlue</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">box</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'.box'</span><span class="p">);</span>
-    <span class="nx">box</span><span class="p">.</span><span class="nx">style</span> <span class="o">=</span> <span class="s1">'background-color: blue;'</span>
-  <span class="p">}</span>
+      const turnBlue = () =&gt; {
+        box = document.querySelector('.box');
+        box.style = 'background-color: blue;'
+      }
 
-  <span class="c1">// Adding the corresponding event listener to each button</span>
-  <span class="kd">const</span> <span class="nx">turnRedButton</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'.turn-red'</span><span class="p">);</span>
-  <span class="nx">turnRedButton</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span> <span class="nx">turnRed</span><span class="p">);</span>
+      // Adding the corresponding event listener to each button
+      const turnRedButton = document.querySelector('.turn-red');
+      turnRedButton.addEventListener('click', turnRed);
 
-  <span class="kd">const</span> <span class="nx">turnBlueButton</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'.turn-blue'</span><span class="p">);</span>
-  <span class="nx">turnBlueButton</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span> <span class="nx">turnBlue</span><span class="p">);</span>
-<span class="nt">&lt;/script&gt;</span>
-</code></pre></div>
+      const turnBlueButton = document.querySelector('.turn-blue');
+      turnBlueButton.addEventListener('click', turnBlue);
+    &lt;/script&gt;
+  </code>
+</pre>
+
 <div class="code__sample">
   <div class="box__single">
   </div>
@@ -161,70 +116,75 @@
 <h3>The Event object</h3>
 
 <p>In the last example we used a callback that took no arguments. The event handler actually receives an <a href="https://developer.mozilla.org/en-US/docs/Web/API/Event">Event</a> object as an argument that we can use to get data about the event. Inside the callback, we then have access to that data to do anything we want.</p>
-<div class="highlight"><pre class="highlight html"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"boxes"</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"box"</span><span class="nt">&gt;</span>
-    Turn me red!
-  <span class="nt">&lt;/div&gt;</span>
-  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"box"</span><span class="nt">&gt;</span>
-    No, turn ME red!
-  <span class="nt">&lt;/div&gt;</span>
-  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"box"</span><span class="nt">&gt;</span>
-    Don't listen to those boxes! Turn me red instead!
-  <span class="nt">&lt;/div&gt;</span>
-<span class="nt">&lt;/div&gt;</span>
 
-<span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"info"</span><span class="nt">&gt;&lt;/div&gt;</span>
+<pre>
+  <code class="language-html">
+    &lt;div class="boxes"&gt;
+      &lt;div class="box"&gt;
+        Turn me red!
+      &lt;/div&gt;
+      &lt;div class="box"&gt;
+        No, turn ME red!
+      &lt;/div&gt;
+      &lt;div class="box"&gt;
+        Don't listen to those boxes! Turn me red instead!
+      &lt;/div&gt;
+    &lt;/div&gt;
 
-<span class="nt">&lt;script&gt;</span>
-  <span class="kd">const</span> <span class="nx">turnAllBlue</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">'.box'</span><span class="p">).</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">box</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="nx">box</span><span class="p">.</span><span class="nx">style</span> <span class="o">=</span> <span class="s1">'background-color: blue;'</span>
-    <span class="p">});</span>
-  <span class="p">}</span>
+    &lt;div class="info"&gt;&lt;/div&gt;
 
-  <span class="c1">// Notice we are requiring an argument (e) for the callback</span>
-  <span class="kd">const</span> <span class="nx">turnTargetRed</span> <span class="o">=</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="cm">/* Now we have access to the event thorugh the e object
-      Look at your console and see all the events properties
-      for yourself */</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+    &lt;script&gt;
+      const turnAllBlue = () =&gt; {
+        document.querySelectorAll('.box').forEach((box) =&gt; {
+          box.style = 'background-color: blue;'
+        });
+      }
 
-    <span class="c1">// We can get the event target</span>
-    <span class="nx">box</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">;</span>
+      // Notice we are requiring an argument (e) for the callback
+      const turnTargetRed = (e) =&gt; {
+        /* Now we have access to the event thorugh the e object
+          Look at your console and see all the events properties
+          for yourself */
+        console.log(e);
 
-    <span class="nx">turnAllBlue</span><span class="p">();</span>
-    <span class="nx">box</span><span class="p">.</span><span class="nx">style</span> <span class="o">=</span> <span class="s1">'background-color: red;'</span>
+        // We can get the event target
+        box = e.target;
 
-    <span class="c1">// And do whatever we want with the event data</span>
-    <span class="kd">const</span> <span class="nx">info</span> <span class="o">=</span> <span class="s2">`Your event was of type </span><span class="p">${</span><span class="nx">e</span><span class="p">.</span><span class="nx">type</span><span class="p">}</span><span class="s2">, you clicked
-      </span><span class="p">${</span><span class="nx">e</span><span class="p">.</span><span class="nx">clientX</span><span class="p">}</span><span class="s2"> X and </span><span class="p">${</span><span class="nx">e</span><span class="p">.</span><span class="nx">clientY</span><span class="p">}</span><span class="s2"> Y coordinates in your browser`</span>
+        turnAllBlue();
+        box.style = 'background-color: red;'
 
-    <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'.info'</span><span class="p">).</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">info</span>
-  <span class="p">}</span>
+        // And do whatever we want with the event data
+        const info = `Your event was of type ${e.type}, you clicked
+          ${e.clientX} X and ${e.clientY} Y coordinates in your browser`
 
-  <span class="cm">/* Adding an event listener to all the boxes so the callback
-    triggers whenever any of the boxes is clicked */</span>
-  <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">'.box'</span><span class="p">).</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">box</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">box</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span> <span class="nx">turnTargetRed</span><span class="p">);</span>
-  <span class="p">});</span>
-<span class="nt">&lt;/script&gt;</span>
+        document.querySelector('.info').innerHTML = info
+      }
 
-<span class="nt">&lt;style&gt;</span>
-  <span class="nc">.box</span> <span class="p">{</span>
-    <span class="nl">height</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
-    <span class="nl">width</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
-    <span class="nl">margin</span><span class="p">:</span> <span class="m">10px</span><span class="p">;</span>
-    <span class="nl">background-color</span><span class="p">:</span> <span class="no">blue</span><span class="p">;</span>
-    <span class="nl">color</span><span class="p">:</span> <span class="m">#fff</span><span class="p">;</span>
-    <span class="nl">text-align</span><span class="p">:</span> <span class="nb">center</span><span class="p">;</span>
-    <span class="nl">padding</span><span class="p">:</span> <span class="m">5px</span><span class="p">;</span>
-  <span class="p">}</span>
+      /* Adding an event listener to all the boxes so the callback
+        triggers whenever any of the boxes is clicked */
+      document.querySelectorAll('.box').forEach((box) =&gt; {
+        box.addEventListener('click', turnTargetRed);
+      });
+    &lt;/script&gt;
 
-  <span class="nc">.boxes</span> <span class="p">{</span>
-    <span class="nl">display</span><span class="p">:</span> <span class="n">flex</span><span class="p">;</span>
-  <span class="p">}</span>
-<span class="nt">&lt;/style&gt;</span>
-</code></pre></div>
+    &lt;style&gt;
+      .box {
+        height: 100px;
+        width: 100px;
+        margin: 10px;
+        background-color: blue;
+        color: #fff;
+        text-align: center;
+        padding: 5px;
+      }
+
+      .boxes {
+        display: flex;
+      }
+    &lt;/style&gt;
+  </code>
+</pre>
+
 <div class="code__sample">
   <div class="boxes">
     <div class="box">
@@ -295,8 +255,11 @@
 <p>All that we seen here is asynchronous code and the same rules apply for it. In particular, we are still running code in a single threaded way. When an event that has a listener associated to it occurs, the callback is added to the execution queue and run when its turn comes.</p>
 
 <p>A quick way to prove this is to go to the last example (either in this article or in your own .html file), open the web inspector’s console and print a long series of numbers</p>
-<div class="highlight"><pre class="highlight javascript"><code><span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">100000</span> <span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="p">};</span>
-</code></pre></div>
+<pre>
+  <code class="language-js">
+    for(let i = 1; i &lt; 100000 ; i++) { console.log(i) };
+  </code>
+</pre>
 <p>while the numbers are printing, try clicking on a red box. You will see the the box does not change its color until all the numbers are printed. That is because when you fire the “click” event, the code is not run automatically. The corresponding callback is added to the execution queue and will be run whenever the browser’s engine finishes running everything it needs to run before the callback gets his turn to be executed. </p>
 
 <h3>Callbacks within callbacks:</h3>
@@ -304,58 +267,61 @@
 <p>Callbacks are just regular JS functions, so we can trigger more asynchronous code inside them. </p>
 
 <p>Let’s show this by creating a minion spawner! </p>
-<div class="highlight"><pre class="highlight html"><code><span class="nt">&lt;div&gt;</span>
-  <span class="nt">&lt;a</span> <span class="na">class=</span><span class="s">"spawner"</span> <span class="na">href=</span><span class="s">"#"</span><span class="nt">&gt;</span>Start Spawning!<span class="nt">&lt;/a&gt;</span>
-  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"status"</span><span class="nt">&gt;&lt;/div&gt;</span>
-  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"minion-container"</span><span class="nt">&gt;&lt;/div&gt;</span>
-<span class="nt">&lt;/div&gt;</span>
+<pre>
+  <code class="language-html">
+    &lt;div&gt;
+      &lt;a class="spawner" href="#"&gt;Start Spawning!&lt;/a&gt;
+      &lt;div class="status"&gt;&lt;/div&gt;
+      &lt;div class="minion-container"&gt;&lt;/div&gt;
+    &lt;/div&gt;
 
-<span class="nt">&lt;script&gt;</span>
-  <span class="kd">const</span> <span class="nx">spawner</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'.spawner'</span><span class="p">);</span>
-  <span class="kd">const</span> <span class="nx">container</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'.minion-container'</span><span class="p">);</span>
+    &lt;script&gt;
+      const spawner = document.querySelector('.spawner');
+      const container = document.querySelector('.minion-container');
 
-  <span class="kd">let</span> <span class="nx">isSpawning</span> <span class="o">=</span> <span class="kc">false</span>
+      let isSpawning = false
 
-  <span class="c1">// Spawn a minion if we are in spawning mode</span>
-  <span class="kd">const</span> <span class="nx">spawnNextMinion</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="k">if</span><span class="p">(</span><span class="nx">isSpawning</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">let</span> <span class="nx">minion</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">'div'</span><span class="p">);</span>
-      <span class="nx">minion</span><span class="p">.</span><span class="nx">classList</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">'minion'</span><span class="p">);</span>
-      <span class="nx">container</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">minion</span><span class="p">);</span>
-      <span class="nx">setTimeout</span><span class="p">(</span><span class="nx">spawnNextMinion</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
+      // Spawn a minion if we are in spawning mode
+      const spawnNextMinion = () =&gt; {
+        if(isSpawning) {
+          let minion = document.createElement('div');
+          minion.classList.add('minion');
+          container.appendChild(minion);
+          setTimeout(spawnNextMinion, 1000);
+        }
+      }
 
-  <span class="c1">// Toggle spawning mode and spawn a minion if it applies</span>
-  <span class="nx">spawner</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">isSpawning</span> <span class="o">=</span> <span class="o">!</span><span class="nx">isSpawning</span>
-    <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
-    <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">innerText</span> <span class="o">=</span> <span class="nx">isSpawning</span> <span class="p">?</span> 
-      <span class="s1">'Stop Spawning!'</span> <span class="p">:</span> <span class="s1">'Continue Spawning!'</span>
-    <span class="k">if</span><span class="p">(</span><span class="nx">isSpawning</span><span class="p">)</span> <span class="p">{</span> <span class="nx">spawnNextMinion</span><span class="p">()</span> <span class="p">};</span>
-  <span class="p">});</span>
+      // Toggle spawning mode and spawn a minion if it applies
+      spawner.addEventListener('click', (e) =&gt; {
+        isSpawning = !isSpawning
+        e.preventDefault();
+        e.target.innerText = isSpawning ? 
+          'Stop Spawning!' : 'Continue Spawning!'
+        if(isSpawning) { spawnNextMinion() };
+      });
 
-<span class="nt">&lt;/script&gt;</span>
+    &lt;/script&gt;
+      
+    &lt;style&gt;
+      .spawner {
+      }
 
-<span class="nt">&lt;style&gt;</span>
-  <span class="nc">.spawner</span> <span class="p">{</span>
-  <span class="p">}</span>
+      .minion-container {
+        display: flex;
+        flex-wrap: wrap;
+        max-width: 100px;
+      }
 
-  <span class="nc">.minion-container</span> <span class="p">{</span>
-    <span class="nl">display</span><span class="p">:</span> <span class="n">flex</span><span class="p">;</span>
-    <span class="nl">flex-wrap</span><span class="p">:</span> <span class="n">wrap</span><span class="p">;</span>
-    <span class="nl">max-width</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
-  <span class="p">}</span>
+      .minion {
+        height: 10px;
+        width: 10px;
+        margin: 3px;
+        background-color: #fae458;
+      }
 
-  <span class="nc">.minion</span> <span class="p">{</span>
-    <span class="nl">height</span><span class="p">:</span> <span class="m">10px</span><span class="p">;</span>
-    <span class="nl">width</span><span class="p">:</span> <span class="m">10px</span><span class="p">;</span>
-    <span class="nl">margin</span><span class="p">:</span> <span class="m">3px</span><span class="p">;</span>
-    <span class="nl">background-color</span><span class="p">:</span> <span class="m">#fae458</span><span class="p">;</span>
-  <span class="p">}</span>
-
-<span class="nt">&lt;/style&gt;</span>
-</code></pre></div>
+    &lt;/style&gt;
+  </code>
+</pre>
 <div class="code__sample">
   <a class="spawner" href="#">Start Spawning!</a>
   <div class="status"></div>
@@ -412,20 +378,3 @@
 <h3>Wrapping up</h3>
 
 <p>There are lots of other stuff related to events that you should learn and become familiar with. As this series focuses on asynchronous programming we will not be touching those topics, but the <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/Events">excellent MDN documentation</a> is a great place to continue reading about them.</p>
-
-            </div>
-          </article>
-        </div>
-        <div class="container__bottom-navigation">
-            <a href="/2017/10/02/asynchrounous-programming-part-1.html" class="bottom-navigation__previous">
-              <div class="bottom-navigation__arrow"><</div>
-              <div>An introduction to JavaScript Asynchronous Programming - Part 1 | General Definitions and Timers</div>
-            </a>
-            <a href="/2018/03/31/testing_custom_form_helpers_in_phoenix.html" class="bottom-navigation__next">
-              <div>Testing Custom Form Helpers in Phoenix</div>
-              <div class="bottom-navigation__arrow">></div>
-            </a>
-        </div>
-    </div>
-  </body>
-</html>
