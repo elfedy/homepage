@@ -1,6 +1,5 @@
 let fs = require('fs');
 let path = require('path');
-let Mustache = require('mustache');
 
 let pagesDir = './src/pages';
 let articlesDir = './src/pages/articles';
@@ -37,25 +36,16 @@ let articles = [
   },
 ]
 
-let layout =
-  fs.readFileSync(pagesDir + '/layouts/index.html', 'utf8');
-
-
 // Build articles
 let indexBody = ''
 articles.forEach( article =>  {
-  let pageContent = fs.readFileSync(path.join(articlesDir, article.file), 'utf8');
-  let page =
-    Mustache.render(
-      layout,
-      {
-        content: `
-          <article>
-            ${pageContent}
-          </article>
-        `
-      }
-    );
+  let pageContent = 
+    `
+     <article>
+       ${fs.readFileSync(path.join(articlesDir, article.file), 'utf8')}
+     </article>
+    `
+  let page = renderContentWithLayout(pageContent);
 
   let articlePath = `/articles/${article.file}`
   indexBody += `
@@ -73,7 +63,7 @@ let indexContent = `
     ${indexBody}
   </ul>
 `;
-let index = Mustache.render(layout, {content: indexContent});
+let index = renderContentWithLayout(indexContent);
 fs.writeFileSync(`./build/index.html`, index, 'utf8');
 
 
@@ -85,9 +75,47 @@ dirEnts.forEach( dirEnt => {
       fs.readFileSync(path.join(pagesDir, dirEnt.name), 'utf8');
 
 
-    let page = Mustache.render(layout, {content: pageContent});
+    let page = renderContentWithLayout(pageContent);
 
     fs.writeFileSync(`./build/${dirEnt.name}`, page, 'utf8');
   }
 });
+
+// HELPERS
+function renderContentWithLayout(content, opts) {
+  opts = opts || {};
+  let stylesheets = ['index.css'];
+  if(opts.sylesheets) {
+    stylesheets = stylesheets.concat(opts.stylesheets);
+  }
+  let styleTags = stylesheets.reduce((accum, stylesheet) => {
+    let ret = (accum + `<link href="${stylesheet}" rel="stylesheet" />`);
+    return ret
+  }, '')
+    
+  let ret = `
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300|PT+Sans" 
+      rel="stylesheet">
+    <title>
+      Software Development | Federico Rodriguez
+    </title>
+    <meta name="description" content="A blog by Federico Rodriguez about Software Development">
+    ${styleTags}
+  </head>
+
+  <body>
+    ${content}
+  </body>
+
+</html>
+`
+  return ret;
+}
 
