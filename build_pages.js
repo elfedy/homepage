@@ -7,31 +7,37 @@ let articles = [
   {
     file: 'store_url_and_friendly_redirect_in_phoenix.html',
     title: 'Storing previous urls and doing friendly redirects in phoenix',
+    description: 'Simple way of doing friendly redirect using plugs',
     date: '2018-07-09',
   },
   {
     file: 'testing_custom_form_helpers_in_phoenix.html',
     title: 'Testing Custom Form Helpers in Phoenix',
+    description: 'Using form helpers as an example of how to write composable tests',
     date: '2018-03-31',
   },
   {
     file: 'asynchronous_programming_part_2.html',
     title: 'An introduction to JavaScript Asynchronous Programming - Part 2 | DOM Events',
+    description: 'An introduction to JavaScript Asynchronous Programming: DOM Events',
     date: '2018-02-19',
   },
   {
     file: 'asynchronous_programming_part_1.html',
     title: 'An introduction to JavaScript Asynchronous Programming - Part 1 | General Definitions and Timers',
+    description: 'Understanding the JavaScript runtime\'s event loop and using timers',
     date: '2017-10-02',
   },
   {
     file: 'learning_frameworks_and_best_practices.html',
     title: 'Thoughts and rules about choosing and applying tools, frameworks and best practices in programming and web development',
+    description: 'Some ideas about how to navigate the endless information that exists within the programming community and what a professinal programmer should to to get better at her job',
     date: '2017-07-25',
   },
   {
     file: 'getting_a_programming_job.html',
     title: 'Going from not knowing about programming to getting a full time job as a web developer',
+    description: 'A detailed step by step guide on what to do from going from zero to getting a web develpment job',
     date: '2017-06-15',
   },
 ]
@@ -41,8 +47,11 @@ let indexBody = ''
 articles.forEach( article =>  {
   let pageContent = 
     `
-     <article>
-       ${fs.readFileSync(path.join(articlesDir, article.file), 'utf8')}
+     <article itemscope itemtype="http://schema.org/BlogPosting">
+       <h1 itemprop="name headling">${article.title}</h1>
+       <div itemprop="articleBody">
+         ${fs.readFileSync(path.join(articlesDir, article.file), 'utf8')}
+       </div>
      </article>
      <link rel="stylesheet"
            href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/default.min.css">
@@ -50,13 +59,16 @@ articles.forEach( article =>  {
      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/languages/elixir.min.js"></script>
      <script>hljs.highlightAll();</script>
     `
-  let page = renderContentWithLayout(pageContent);
+  let page = renderContentWithLayout(
+    pageContent,
+    {title: article.title, description: article.description}
+  );
 
   let articlePath = `/articles/${article.file}`
   indexBody += `
-  <li>
+  <li itemscope itemtype="http://schema.org/BlogPosting">
     <time>${article.date}</time>
-    <h2><a href=${articlePath}>${article.title}</a></h2>
+    <h2 itemprop="name headline"><a href=${articlePath}>${article.title}</a></h2>
   </li>
   `
 
@@ -64,11 +76,13 @@ articles.forEach( article =>  {
 })
 
 let indexContent = `
-  <ul>
-    ${indexBody}
-  </ul>
+  <div itemscope itemtype="http://schema.org/Blog">
+    <ul itemscope itemtype="http://schema.org/blogPosts">
+      ${indexBody}
+    </ul>
+  </div>
 `;
-let index = renderContentWithLayout(indexContent);
+let index = renderContentWithLayout(indexContent, {title: 'Federico Rodriguez | Software Develobpment Blog', description: 'Latest articles by Federico Rodriguez'});
 fs.writeFileSync(`./build/index.html`, index, 'utf8');
 
 
@@ -89,6 +103,8 @@ dirEnts.forEach( dirEnt => {
 // HELPERS
 function renderContentWithLayout(content, opts) {
   opts = opts || {};
+  let description = opts.description || "Sofware Development by Federico Rodriguez";
+  let title = opts.title || 'Software Development | Federico Rodriguez';
   let stylesheets = ['/index.css'];
   if(opts.sylesheets) {
     stylesheets = stylesheets.concat(opts.stylesheets);
@@ -109,9 +125,9 @@ function renderContentWithLayout(content, opts) {
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300|PT+Sans" 
       rel="stylesheet">
     <title>
-      Software Development | Federico Rodriguez
+      ${title}
     </title>
-    <meta name="description" content="A blog by Federico Rodriguez about Software Development">
+    <meta name="description" content="${description}">
     ${styleTags}
   </head>
 
