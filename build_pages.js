@@ -44,6 +44,11 @@ articles.forEach( article =>  {
      <article>
        ${fs.readFileSync(path.join(articlesDir, article.file), 'utf8')}
      </article>
+     <link rel="stylesheet"
+           href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/default.min.css">
+     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script> 
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/languages/elixir.min.js"></script>
+     <script>hljs.highlightAll();</script>
     `
   let page = renderContentWithLayout(pageContent);
 
@@ -84,7 +89,7 @@ dirEnts.forEach( dirEnt => {
 // HELPERS
 function renderContentWithLayout(content, opts) {
   opts = opts || {};
-  let stylesheets = ['index.css'];
+  let stylesheets = ['/index.css'];
   if(opts.sylesheets) {
     stylesheets = stylesheets.concat(opts.stylesheets);
   }
