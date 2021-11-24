@@ -14,33 +14,6 @@
 <p>We want to store the url of every get request that is not related to creating a new user or a new session. For this example we will asume we have REST <code>user</code>, <code>session</code> and <code>password_reset</code> routes, such as the ones used by the <a href="https://github.com/riverrun/phauxth">phauxth</a> library. In this case, we would like to avoid storing the following routes:</p>
 
 <pre>
-  <code class="language-elixir">
-    defmodule MyApp.FriendlyRedirect do
-      import Plug.Conn
-
-      def store_path_in_session(conn, _) do
-        # Get HTTP method and url from conn
-        method = conn.method
-        path = conn.request_path
-
-        # If conditions apply store path in session, else return conn unmodified 
-        case {method, storable?(path)} do
-          {"GET", true} -&gt;
-            put_session(conn, :firendly_redirect_path, path)
-      
-          {_, _} -&gt;
-            conn
-        end
-      end
-
-      defp storable?(path) do
-        !(url =~ r/user|session|password_resets/)
-      end
-    end
-  </code>
-</pre>
-
-<pre>
   <code>
     GET     /sessions/new       
     GET     /password_resets/new
