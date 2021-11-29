@@ -1,8 +1,27 @@
 let fs = require('fs');
 let path = require('path');
 
-let pagesDir = './src/pages';
-let articlesDir = './src/pages/articles';
+let buildDir = 'build';
+let pagesDir = 'src/pages';
+let articlesDir = 'src/pages/articles';
+let gamesDir = 'src/games';
+
+let routes = {
+  articles: {
+    index: 'index.html',
+    show: (filename) => path.join('articles', filename),
+  },
+  games: {
+    index: path.join('games.html'), 
+    show: (filename) => path.join('games', filename),
+  }
+}
+
+function buildPath(route) {
+  return path.join(buildDir, route);
+}
+
+// ARTICLES
 let articles = [
   {
     file: 'store_url_and_friendly_redirect_in_phoenix.html',
@@ -64,7 +83,7 @@ articles.forEach( article =>  {
     {title: article.title, description: article.description}
   );
 
-  let articlePath = `/articles/${article.file}`
+  let articlePath = routes.articles.show(article.file);
   indexBody += `
   <li itemscope itemtype="http://schema.org/BlogPosting">
     <time>${article.date}</time>
@@ -72,9 +91,10 @@ articles.forEach( article =>  {
   </li>
   `
 
-  fs.writeFileSync(`./build/articles/${article.file}`, page, 'utf8');
+  fs.writeFileSync(buildPath(articlePath), page, 'utf8');
 })
 
+// Article Index
 let indexContent = `
   <div itemscope itemtype="http://schema.org/Blog">
     <ul itemscope itemtype="http://schema.org/blogPosts">
@@ -82,11 +102,11 @@ let indexContent = `
     </ul>
   </div>
 `;
-let index = renderContentWithLayout(indexContent, {title: 'Federico Rodriguez | Software Develobpment Blog', description: 'Latest articles by Federico Rodriguez'});
-fs.writeFileSync(`./build/index.html`, index, 'utf8');
+let index = renderContentWithLayout(indexContent, {title: 'Federico Rodriguez | Software Development Blog', description: 'Latest articles by Federico Rodriguez'});
+fs.writeFileSync(buildPath(routes.articles.index), index, 'utf8');
 
 
-// Build each page inside the layout
+// PAGES
 let dirEnts = fs.readdirSync(pagesDir, {withFileTypes: true});
 dirEnts.forEach( dirEnt => {
   if(dirEnt.isFile()) {
@@ -96,7 +116,7 @@ dirEnts.forEach( dirEnt => {
 
     let page = renderContentWithLayout(pageContent);
 
-    fs.writeFileSync(`./build/${dirEnt.name}`, page, 'utf8');
+    fs.writeFileSync(buildPath(dirEnt.name), page, 'utf8');
   }
 });
 
@@ -122,8 +142,6 @@ function renderContentWithLayout(content, opts) {
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300|PT+Sans" 
-      rel="stylesheet">
     <title>
       ${title}
     </title>
