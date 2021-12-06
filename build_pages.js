@@ -13,7 +13,8 @@ let routes = {
   },
   games: {
     index: path.join('games.html'), 
-    show: (filename) => path.join('games', filename),
+    show: (dir) => path.join('games', dir, 'index.html'),
+    snapshot: (dir, snapshot) => path.join('games', dir, snapshot),
   }
 }
 
@@ -105,6 +106,39 @@ let indexContent = `
 let index = renderContentWithLayout(indexContent, {title: 'Federico Rodriguez | Software Development Blog', description: 'Latest articles by Federico Rodriguez'});
 fs.writeFileSync(buildPath(routes.articles.index), index, 'utf8');
 
+// GAMES
+let games = [
+  {
+    dir: 'tanks',
+    snapshot: 'tanks_overview.png',
+    title: 'Tanks',
+    description: 'Battle city inspired tank shooter',
+  },
+]
+
+let gamesIndexBody = ''
+games.forEach( game =>  {
+  let gamePath = routes.games.show(game.dir);
+  gamesIndexBody += `
+  <li itemscope itemtype="http://schema.org/Game">
+    <a href=${gamePath}>
+    <h2 itemprop="name">${game.title}</h2>
+    <img src=${routes.games.snapshot(game.dir, game.snapshot)}>
+  </li>
+  `
+})
+
+let gamesIndexContent = `
+  <ul>
+    ${gamesIndexBody}
+  </ul>
+`;
+let gamesIndex = renderContentWithLayout(
+  gamesIndexContent, 
+  {title: 'Federico Rodriguez | Games', description: 'Games by Federico Rodriguez'}
+);
+fs.writeFileSync(buildPath(routes.games.index), gamesIndex, 'utf8');
+
 
 // PAGES
 let dirEnts = fs.readdirSync(pagesDir, {withFileTypes: true});
@@ -112,7 +146,6 @@ dirEnts.forEach( dirEnt => {
   if(dirEnt.isFile()) {
     let pageContent =
       fs.readFileSync(path.join(pagesDir, dirEnt.name), 'utf8');
-
 
     let page = renderContentWithLayout(pageContent);
 
@@ -123,7 +156,7 @@ dirEnts.forEach( dirEnt => {
 // HELPERS
 function renderContentWithLayout(content, opts) {
   opts = opts || {};
-  let description = opts.description || "Sofware Development by Federico Rodriguez";
+  let description = opts.description || 'Sofware Development by Federico Rodriguez';
   let title = opts.title || 'Software Development | Federico Rodriguez';
   let stylesheets = ['/index.css'];
   if(opts.sylesheets) {

@@ -13,7 +13,7 @@ timestart=$SECONDS
 
 node build_pages.js
 npx postcss src/css/index.css > build/index.css
-cp src/games/* build/games
+cp -r src/games/* build/games
 
 timeend=$SECONDS
 timediff=$(($timeend - $timestart))
