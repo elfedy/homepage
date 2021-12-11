@@ -81,7 +81,11 @@ articles.forEach( article =>  {
     `
   let page = renderContentWithLayout(
     pageContent,
-    {title: article.title, description: article.description}
+    {
+      title: article.title,
+      description: article.description,
+      stylesheets: ['/article.css'],
+    }
   );
 
   let articlePath = routes.articles.show(article.file);
@@ -103,7 +107,14 @@ let indexContent = `
     </ul>
   </div>
 `;
-let index = renderContentWithLayout(indexContent, {title: 'Federico Rodriguez | Software Development Blog', description: 'Latest articles by Federico Rodriguez'});
+let index = renderContentWithLayout(
+  indexContent,
+  {
+    title: 'Federico Rodriguez | Software Development Blog',
+    description: 'Latest articles by Federico Rodriguez',
+    stylesheets: ['/article_index.css'],
+  }
+);
 fs.writeFileSync(buildPath(routes.articles.index), index, 'utf8');
 
 // GAMES
@@ -159,13 +170,23 @@ function renderContentWithLayout(content, opts) {
   let description = opts.description || 'Sofware Development by Federico Rodriguez';
   let title = opts.title || 'Software Development | Federico Rodriguez';
   let stylesheets = ['/index.css'];
-  if(opts.sylesheets) {
+  if(opts.stylesheets) {
     stylesheets = stylesheets.concat(opts.stylesheets);
   }
   let styleTags = stylesheets.reduce((accum, stylesheet) => {
     let ret = (accum + `<link href="${stylesheet}" rel="stylesheet" />`);
     return ret
   }, '')
+
+  let headerLinks = [
+    [routes.articles.index, "Blog"],
+    [routes.games.index, "Games"],
+    ["/about", "About"],
+  ]
+  headerLinks = headerLinks.reduce((previous, [path, name]) => {
+    let ret = previous + `<li><a href=${path}>${name}</a></li>`;
+    return ret;
+  }, '');
     
   let ret = `
 <!doctype html>
@@ -183,7 +204,16 @@ function renderContentWithLayout(content, opts) {
   </head>
 
   <body>
-    ${content}
+    <header>
+      <nav>
+        <ul>
+          ${headerLinks}
+        </ul>
+      </nav>
+    </header>
+    <main>
+      ${content}
+    </main>
   </body>
 
 </html>

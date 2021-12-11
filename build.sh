@@ -11,8 +11,16 @@ mkdir build/games
 echo starting build..
 timestart=$SECONDS
 
+# html pages
 node build_pages.js
-npx postcss src/css/index.css > build/index.css
+
+# css
+for file in src/css/*.css
+do
+  ./build_css_file.sh $file 
+done
+
+# copy games (src should just have a build)
 cp -r src/games/* build/games
 
 timeend=$SECONDS
