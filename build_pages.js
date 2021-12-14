@@ -8,11 +8,11 @@ let gamesDir = 'src/games';
 
 let routes = {
   articles: {
-    index: 'index.html',
+    index: '/index.html',
     show: (filename) => path.join('articles', filename),
   },
   games: {
-    index: path.join('games.html'), 
+    index: path.join('/games.html'), 
     show: (dir) => path.join('games', dir, 'index.html'),
     snapshot: (dir, snapshot) => path.join('games', dir, snapshot),
   }
@@ -101,10 +101,15 @@ articles.forEach( article =>  {
 
 // Article Index
 let indexContent = `
-  <div itemscope itemtype="http://schema.org/Blog">
-    <ul itemscope itemtype="http://schema.org/blogPosts">
-      ${indexBody}
-    </ul>
+  <div style="max-width: 960px; margin: 0 auto; padding: 0 1rem;">
+    <h1>
+      Latest Blog Posts
+    </h1>
+    <div itemscope itemtype="http://schema.org/Blog">
+      <ul class="blog__article-list" itemscope itemtype="http://schema.org/blogPosts">
+        ${indexBody}
+      </ul>
+    </div>
   </div>
 `;
 let index = renderContentWithLayout(
@@ -124,6 +129,7 @@ let games = [
     snapshot: 'tanks_overview.png',
     title: 'Tanks',
     description: 'Battle city inspired tank shooter',
+    github: 'https://github.com/elfedy/tanks',
   },
 ]
 
@@ -133,20 +139,29 @@ games.forEach( game =>  {
   gamesIndexBody += `
   <li itemscope itemtype="http://schema.org/Game">
     <a href=${gamePath}>
-    <h2 itemprop="name">${game.title}</h2>
-    <img src=${routes.games.snapshot(game.dir, game.snapshot)}>
+      <h2 itemprop="name">${game.title}</h2>
+      <img class="games-list__snapshot" src=${routes.games.snapshot(game.dir, game.snapshot)}>
+    </a>
+    <p>${game.description}</p>
+    <a href=${game.github}>
+      <img src="/github.svg" alt="game Github repo" rel="noopener noreferrer" class="games-list__external-link" />
+    </a>
   </li>
   `
 })
 
 let gamesIndexContent = `
-  <ul>
+  <ul class="games-list">
     ${gamesIndexBody}
   </ul>
 `;
 let gamesIndex = renderContentWithLayout(
   gamesIndexContent, 
-  {title: 'Federico Rodriguez | Games', description: 'Games by Federico Rodriguez'}
+  {
+    title: 'Federico Rodriguez | Games',
+    description: 'Games by Federico Rodriguez',
+    stylesheets: ['/games_index.css'],
+  }
 );
 fs.writeFileSync(buildPath(routes.games.index), gamesIndex, 'utf8');
 
@@ -214,6 +229,13 @@ function renderContentWithLayout(content, opts) {
     <main>
       ${content}
     </main>
+    <footer>
+      <ul>
+        <li><a href="https://github.com/elfedy" rel="noopener noreferrer"><img src="./github.svg" alt="Github" /></a></li>
+        <li><a href="https://www.linkedin.com/in/federico-andr%C3%A9s-rodr%C3%ADguez-314a58b8/" rel="noopener noreferrer"><img src="./linked_in.svg" alt="Linked In" /></a></li>
+        <li><a href="https://twitter.com/elfedyrodriguez" rel="noopener noreferrer"><img src="./twitter.svg" alt="Twitter" /></a></li>
+      </ul>
+    </footer>
   </body>
 
 </html>

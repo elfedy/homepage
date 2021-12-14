@@ -26,6 +26,6 @@ const stop = chokidar.watch('./src').on('change', filepath => {
 
 			console.log(stdout);
       let after = new Date();
-      console.log(`run ${command} in ${(after - now) / 1000} seconds`);
+      console.log(`ran ${command} in ${(after - now) / 1000} seconds`);
 		})
 })

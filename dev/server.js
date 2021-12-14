@@ -10,6 +10,7 @@ const port = process.argv.length > 3 ? process.argv[3] : 8080;
 
 const mediaTypes = {
   png: 'image/png',
+  svg: 'image/svg+xml',
   html: 'text/html',
   css: 'text/css',
 };

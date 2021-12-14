@@ -23,6 +23,9 @@ done
 # copy games (src should just have a build)
 cp -r src/games/* build/games
 
+# copy images
+cp src/images/* build/
+
 timeend=$SECONDS
 timediff=$(($timeend - $timestart))
 echo built successfully in $timediff seconds
