@@ -15,5 +15,8 @@
     "marked": "^4.0.3",
     "postcss-cli": "^9.0.2",
     "postcss-nested": "^5.0.6"
+  },
+  "dependencies": {
+    "postcss": "^8.4.5"
   }
 }
