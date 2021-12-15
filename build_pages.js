@@ -179,6 +179,25 @@ dirEnts.forEach( dirEnt => {
   }
 });
 
+function renderGATrackingCode() {
+  let trackingId = process.env.GA_TRACKING_ID;
+  if(trackingId) {
+    return `
+      <script async src="https://www.googletagmanager.com/gtag/js?id=${trackingId}"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '${trackingId}');
+    </script>
+    `;
+  } else {
+    return '';
+  }
+
+}
+
 // HELPERS
 function renderContentWithLayout(content, opts) {
   opts = opts || {};
@@ -190,7 +209,7 @@ function renderContentWithLayout(content, opts) {
   }
   let styleTags = stylesheets.reduce((accum, stylesheet) => {
     let ret = (accum + `<link href="${stylesheet}" rel="stylesheet" />`);
-    return ret
+    return ret;
   }, '')
 
   let headerLinks = [
@@ -207,6 +226,7 @@ function renderContentWithLayout(content, opts) {
 <!doctype html>
 <html>
   <head>
+    ${renderGATrackingCode()}
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport"
