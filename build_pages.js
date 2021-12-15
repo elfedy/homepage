@@ -231,9 +231,9 @@ function renderContentWithLayout(content, opts) {
     </main>
     <footer>
       <ul>
-        <li><a href="https://github.com/elfedy" rel="noopener noreferrer"><img src="./github.svg" alt="Github" /></a></li>
-        <li><a href="https://www.linkedin.com/in/federico-andr%C3%A9s-rodr%C3%ADguez-314a58b8/" rel="noopener noreferrer"><img src="./linked_in.svg" alt="Linked In" /></a></li>
-        <li><a href="https://twitter.com/elfedyrodriguez" rel="noopener noreferrer"><img src="./twitter.svg" alt="Twitter" /></a></li>
+        <li><a href="https://github.com/elfedy" rel="noopener noreferrer"><img src="/github.svg" alt="Github" /></a></li>
+        <li><a href="https://www.linkedin.com/in/federico-andr%C3%A9s-rodr%C3%ADguez-314a58b8/" rel="noopener noreferrer"><img src="/linked_in.svg" alt="Linked In" /></a></li>
+        <li><a href="https://twitter.com/elfedyrodriguez" rel="noopener noreferrer"><img src="/twitter.svg" alt="Twitter" /></a></li>
       </ul>
     </footer>
   </body>
