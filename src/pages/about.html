@@ -3,8 +3,9 @@
   <div class="about__container">
     <img src="/federico_rodriguez.png" 
       alt="Federico Rodriguez" 
-      style="width: 40%; border-radius: 50%;" />
-    <div style="padding: 2rem;">
+      class="about__image"
+      />
+    <div class="about__text">
       <p>
       I am an Industrial Engineer who fell in love with programming and turned into a software developer. I have done web development on an most parts of the stack and currently work on the crypto space at <a href="https://delphidigital.io/labs" rel="noopener noreferrer">Delphi Labs</a>.
       </p>
@@ -18,12 +19,34 @@
   .about__container {
     display: flex;
     flex-direction: row;
+
   }
+
+  .about__image {
+    width: 40%;
+    border-radius: 50%;
+  }
+
+  .about__text {
+    padding: 2rem;
+  }
+
   @media (max-width: 800px) {
     .about__container {
       flex-direction: column;
       justify-content: center;
       align-items: center;
+
+    }
+    
+    .about__image {
+      width: 100%;
+      max-width: 400px;
+      padding: 0 4rem;
+    }
+
+    .about__text {
+      padding: 1rem;
     }
   }
 </style>
