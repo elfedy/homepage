@@ -25,6 +25,12 @@ function buildPath(route) {
 // ARTICLES
 let articles = [
   {
+    file: 'thoughts_on_the_execution_of_smart_contract_protocols.html',
+    title: 'Thoughs on the execution of Smart Contract protocols',
+    description: 'Ideas on how to go about building a Smart Contract protocol and organizing a team',
+    date: '2022-08-08',
+  },
+  {
     file: 'store_url_and_friendly_redirect_in_phoenix.html',
     title: 'Storing previous urls and doing friendly redirects in phoenix',
     description: 'Simple way of doing friendly redirect using plugs',

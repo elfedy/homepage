@@ -1,0 +1,237 @@
+<p>
+During the past year, I was a contributor to a smart contract protocol. I had never been part of such a project before and had not much idea of what it entailed. I found <a href="https://docs.openzeppelin.com/learn/">good guides</a> about how to technically approach the task, but not much about how to execute the protocol as part of an interdisciplinary team. That lack of information led to anxiety and mistakes that were made along the process. This is my attempt to gather ideas about how to execute them successfully from the point of view of a software developer. Sort of a hand-sketched map of uncharted territory made in hope that teams have a better idea of what they will face and recommendations on how to approach it.
+</p>
+
+<p>
+The blockchain the protocol was deployed on used <a href="https://cosmwasm.com/">CosmWasm</a> as its SC platform. I do not have experience with other technologies. Some concepts might be particular to that environment but most are probably applicable to a broader spectrum.
+</p>
+
+<h2>
+General Concepts
+</h2>
+
+<h3>
+Characteristics of Smart Contract Development
+</h3>
+<p>
+Smart Contract applications are of lower complexity related to other types of software. This is because there are lots of limitations on what you can do. SCs can only do three things:
+</p>
+
+<ol>
+  <li>
+    Read/Write to a predefined KV store.
+  </li>
+  <li>
+Write transaction logs.
+  </li>
+  <li>
+Run other pieces of code that are part of the particular blockchain they are on. These are also limited to doing 1 or 2 above, with a different scope.
+  </li>
+</ol>
+
+<p>
+You are also limited on how many of those three things you can chain together. You are sharing storage and computing power with the rest of the network. The code is uploaded to the blockchain and whatever call is made to it needs to be able to involve the loading and execution of the code in a time that's fast enough for validators to run and verify the results.
+</p>
+
+<p>
+Smart contract software is of high risk because a bug can mean the protocol is over, or that its reputation is heavily damaged. It is also very hard to recover from exploits because it is not possible to roll back transactions/state arbitrarily.
+</p>
+
+<p>
+Another important aspect is that once a contract is uploaded to the blockchain, it is very hard to modify the functionality of that particular contract, and the state recorded there is tied to it forever.
+</p>
+
+<p>
+Smart contract development has slower feedback loops than other types of software. SCs run as part of a decentralized/distributed protocol. The version of that protocol that can be run on any developer's machine is very far away from the real thing. The process to upload contracts, update state, do transactions and check new state both locally and on testnets is often slow. It takes a lot of time and practice to develop a workflow in which the application can be tested correctly.
+</p>
+
+<p>
+Protocols are ideally open sourced and their functionality is public. This means there's little competitive edge in having novel features, there's no IP here. Ideas mean nothing. The community that executes a certain type of protocol better and faster wins.
+</p>
+
+<h3>
+Guidelines for protocol design
+</h3>
+<p>
+Given those general characteristics, here are some ideas about what to favor when making decisions about protocol design. A successful development team will be able to communicate these ideas from the start with the rest of the (non-technical) contributors so that they can be allies. Failure to communicate and apply these means giving a competitive edge in the execution battle and, as mentioned before, SCs are all about good execution.
+
+<p>
+<strong>Simple straightforward implementations win over complex sophisticated ones.</strong> Less is more, much more so with this technology than with any other. Every single detail or piece of functionality adds a lot of overhead: more testing requirements, extra attack vectors, and added gas costs. Time to ship and chances of getting hacked grow exponentially with each extra feature the protocol has. Always pick the implementation that does 80% of what you want with 20% of the code. Nice to haves are pretty expensive, when in doubt about whether some piece of functionality adds value to the protocol or not, remove it.
+</p>
+
+<p>
+<strong>What can be done off-chain should be done off-chain.</strong> On-chain computations are several orders of magnitude more expensive than off-chain, so any logic that can be moved off-chain without sacrificing decentralization is a big win. A textbook example would be logging aggregated statistics which should be done by indexers that source data from well-placed events instead of being stored in the contract event logs.
+</p>
+
+<p>
+<strong>Making the protocol extensible from the start.</strong> This is super counterintuitive to me as I am a big advocate of not doing any pre-mature optimizations. However, once a smart contract is deployed, the cost to change it skyrockets (sometimes it is not even possible to change anything). This brings up the need to think about how will you add new functionality. For all key parts of the protocol, it is worth thinking about how they may be extended in the future and trying to design things in a way that can be extended without being aware of the exact implementation details.
+</p>
+
+<p>
+<strong>Making the rollout smooth and on stages by design:</strong>. The more progressive exposure the rollout of the protocol the better. This way hypothesis can be validated with managed risk and corrective measures can be taken into account without having to manage everything at once. As If the protocol handles liquidity, maybe try to limit the amount of liquidity it can manage at first. If a minimal version of the protocol can be deployed, before enabling all designed features at one can be deployed, then do so. Maybe some set of publicly known addresses (ideally multisigs) have special privileges for a limited amount of time so that corrective measures can be taken in case of problems until the protocol becomes more stable.
+</p>
+
+<p>
+<strong>Add circuit breakers when possible.</strong> Always think about what things could go wrong and if some functionality can be baked in on the protocol that can mitigate the damage.
+</p>
+
+<h2>
+A Proposed Development Lifecycle
+</h2>
+<p>
+Here's a sample development lifecycle that could serve as a guideline. The lifecycle is divided into stages. Without setting particular time durations, there is some idea of the orders of magnitude each stage should take.
+</p>
+
+<p>
+Given the nature of smart contracts. The flow is very waterfall-like since once the code is deployed to production and its state initializes, the ability to change things is severely diminished. So thinking about a high iteration/agile/move fast-break things approach is not very realistic in this case (It might be for the front-end side of the app though)
+</p>
+
+<div style="display: flex; flex-direction: row;">
+  <h3>
+  Initial Spec
+  </h3>
+  <span style="font-style: italic; align-self: center; margin-left: 0.2rem; font-size: 0.8rem">
+   - (from day 0 until 5% of total dev time til launch)
+  <span>
+</div>
+
+<p>
+The project should start with a written spec of what the protocol should do. It is expected that protocol functionality will be iterated upon but ideally, the spec would be as detailed as possible including:
+</p>
+<ul>
+  <li>
+All intended functionality (main and also misc features such as incentives)
+  </li>
+  <li>
+Launch campaigns and how they will interact with the protocol (E.g: Airdrop)
+  </li>
+  <li>
+Circuit breakers to add on which features, or general guidelines on where these should be added
+  </li>
+  <li>
+Rollout plan including progressive stages and "degrees" of decentralization
+  </li>
+</ul>
+<p>
+The spec may be part of multiple documents but it is important to be kept up to date and for it to be visible to all members of the team. These should be living documents that get updated along with each iteration of the protocol and its changes broadcast to everyone involved. They should be the "law" in that what's written there is what defines the protocol behavior and its parameters.
+</p>
+
+
+<div style="display: flex; flex-direction: row;">
+  <h3>
+    Exploration Stage
+  </h3>
+  <span style="font-style: italic; align-self: center; margin-left: 0.2rem; font-size: 0.8rem">
+   - (from initial spec up until 50% of total dev time til launch)
+  <span>
+</div>
+
+<p>
+Once the initial spec is defined, development starts. At this stage, multiple new ideas will come up, and hypotheses will be battle tested and concepts reshaped as the protocol begins to come to life and is interacted with. At this stage, every proposed change is fair game and should be considered.
+</p>
+<p>
+The goal should be to have a concrete working version of the protocol and to finalize the spec with all the detailed functionality so it is (almost) set in stone for further stages. By set in stone, I mean that every part of the protocol (including a fully detailed rollout plan) is defined at the end of this stage. This is the stage where changes can happen. Since smart contract protocols are very high risk, they cannot launch with bugs on them. To mitigate that risk, testing on each of the features has to be thorough. If changes are done after the testing, then all that testing effort is wasted and needs to be re-done with the new set of changes.
+</p>
+<p>
+It is important to highlight that for the process to be successful, every contributor or at least someone representing each part of the team (product, risk, community, etc) interacts with the latest version of the protocol every week. This is crucial to arrive at a fully defined spec at the end of this stage. It won't be if all parties involved do not "see" the protocol in action and have seen the ideas on the spec in a concrete living form. Everyone's mindset shifts when trying the app for real and feature/change requests are guaranteed to happen at that point. Doing it early ensures these requests and discussions happen before the cost of changing increases.
+</p>
+
+<div style="display: flex; flex-direction: row;">
+  <h3>
+    Fine Tuning
+  </h3>
+  <span style="font-style: italic; align-self: center; margin-left: 0.2rem; font-size: 0.8rem">
+   - (from the end of the exploration stage up until 75% of total dev time til launch)
+  <span>
+</div>
+<p>
+At this point, the prototype should be finished and the dev team should move to ensuring high test coverage and fixing bugs/security issues that they find. If there's a plan to do QA testing, now is the time to do it.
+Changes at this point can be made but they should be the exception. Changes now become are more expensive because of testing. A protocol cannot launch without ALL features being tested. When changing the protocol, a lot of the testing effort is wasted and needs to be redone. Late modifications to the protocol are also riskier. They will be tested more poorly as they run for less time in the testing environment vs features that are in the protocol from the start. There should be processes in place to protect the dev team from changes/feature requests at this point and whoever makes the request should be fully aware and bare the cost of the changes that are being requested.
+If there are plans of making formal audits, they should be requested halfway through this stage, aiming to finish it when the audit starts.
+</p>
+
+<h3>
+Audits + Final Testing
+</h3>
+<p>
+Before the audit. The team should prepare in advance for the code freeze and have documentation ready for the auditors to read. There should be 100% availability to clear any doubts from the auditors.
+Audits will take longer than expected and it is really hard to time the exact time they will start when planning as you need to be ready to get audited but they also need to be booked in advance to guarantee availability.
+The development team should think about audits as an extra check on the protocol and not a guarantee that it works properly and safely. The core team is the one that knows the protocol best and it is ultimately responsible for ensuring its safety.
+</p>
+<p>
+The protocol will ideally get audited when there's a release candidate. Auditors will ask for a particular commit to be used as reference and the closer that commit is to the final version of the protocol, the more valuable the audit will be. While you audit there are several tasks the team can dedicate you:
+</p>
+<ul>
+  <li>
+A launch plan should ideally be set into place but now is the time to fine-tune it and rehearse it a couple of times.
+  </li>
+  <li>
+All the infra to run the protocol should be already be defined and set up, and have a "testnet" version. Use this instance to double-check everything, make sure to load test, and that you are covered for high amounts of traffic or really bad scenarios.
+  </li>
+  <li>
+More testing by the team and almost any person you can get to try the protocol.
+  </li>
+</ul>
+<p>
+After audits are addressed the protocol should be ready to be launched.
+</p>
+
+<h3>
+Launch
+</h3>
+<p>
+The launch should be done almost from muscle memory. All stages of the launch should have already been rehearsed and scripts written to automate them.
+Here you also set up the actual infrastructure for the protocol. Make sure you have good observability (logging, metrics, errors, etc) that is available to all relevant contributors).
+</p>
+
+<h2>
+Special Aspects of SC development
+</h2>
+
+<h3>
+Testing and Continuous Integration
+</h3>
+There should be four types of testing with different purposes:
+<ul>
+  <li>
+Unit tests should simulate contract calls and check the desired state. These are mostly required because development feedback loops are slow and unit tests are the only way to get around it. This is one of the few software types where heavy unit testing has a good ROI even though the team coding on the protocol may be small.
+</li>
+  <li>
+Integration tests where an instance of the blockchain is run on the developer's machine, smart contracts are deployed and transactions/queries run to ensure the state is the correct one. At first, they should be pretty broad and should be done more as a warm-up for the team working on setting the testnet environment. Closer to the fine-tuning stage, there should be a meaningful integration test per important protocol "flow".
+  </li>
+  <li>
+Manual testing at the beginning stages (but ongoing and frequent by the whole team or at least one representative of each area). That's more oriented for the team to be "aware" internally of how the thing works. Detect use cases that we are missing, use cases that we defined previously that we should not have. The focus is to "shape" the product, not to find bugs (finding them is a side effect here).
+  </li>
+  <li>
+Manual testing at the end is dedicated only to finding issues/bugs, maybe with the involvement of a QA team. It is more expensive and tedious to do so it must be ensured that it is done when it matters and pays off the most.
+  </li>
+</ul>
+
+<h3>
+Bots and Infrastructure
+</h3>
+<p>
+Have reliability when it matters (i.e: have multiple bots that execute critical calls for the protocol) and good observability. Bots/infra should ideally ran by the comunity.
+There should be a thorough plan of what you need but as it can be improved continuously you don't need a perfect setup at launch. However, dedicated infrastructure both for frontend and bots should be planned at the start of the project and baked into the testing lifecycle as it takes a considerable time to build and get right. When not possible to be run by the core team, find a partner who can do it.
+</p>
+
+<h3>
+Operating the protocol
+</h3>
+<p>
+All standard procedures done by the team (example: submitting/executing proposals or migrating the protocol) must be executed almost from muscle memory when the protocol is live.
+Whenever the fixes/mitigations require human interaction, they must be practiced many times so they are executed flawlessly when the time comes.
+<p>
+
+<h3>
+About getting hacked
+</h3>
+<p>
+I did not have the experience of the protocol getting hacked. But I think the right mindset to have is that hacks are not a matter of if but a matter of when. The playing field is unfairly leveled towards the hacker. A team developing a smart contract protocol (or any software for that matter) has to operate over a broad spectrum of constraints that involve product specifications and time pressure. The team has to get it right every time and make no mistakes while under those constraints. A hacker has all the time in the world and only needs to be right once to be successful.
+</p>
+<p>
+Even though a team must prevent attacks to the best of its ability, it is fairly unrealistic to assume that probability is zero. As with protocol operations, procedures should be in place to act quickly when something goes wrong.
+</p>
+<p>
+There's a tradeoff between total decentralization and having a window for a selected number of addresses to be able to trigger circuit breakers and update the protocol without the need to go through the normal governance timelines. The optimal tradeoffs of centralization/decentralization and the techniques applied to react to hacks are a very green area right now.
+</p>
