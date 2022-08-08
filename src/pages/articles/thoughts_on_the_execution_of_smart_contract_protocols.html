@@ -68,7 +68,7 @@ Given those general characteristics, here are some ideas about what to favor whe
 </p>
 
 <p>
-<strong>Making the rollout smooth and on stages by design:</strong>. The more progressive exposure the rollout of the protocol the better. This way hypothesis can be validated with managed risk and corrective measures can be taken into account without having to manage everything at once. As If the protocol handles liquidity, maybe try to limit the amount of liquidity it can manage at first. If a minimal version of the protocol can be deployed, before enabling all designed features at one can be deployed, then do so. Maybe some set of publicly known addresses (ideally multisigs) have special privileges for a limited amount of time so that corrective measures can be taken in case of problems until the protocol becomes more stable.
+<strong>Making the rollout smooth and on stages by design.</strong> The more progressive exposure the rollout of the protocol the better. This way hypothesis can be validated with managed risk and corrective measures can be taken into account without having to manage everything at once. If the protocol handles liquidity, maybe try to limit the amount of liquidity it can manage at first. If a minimal version of the protocol can be deployed, before enabling all designed features at one can be deployed, then do so. Maybe some set of publicly known addresses (ideally multisigs) have special privileges for a limited amount of time so that corrective measures can be taken in case of problems until the protocol becomes more stable.
 </p>
 
 <p>
@@ -127,7 +127,7 @@ The spec may be part of multiple documents but it is important to be kept up to 
 </div>
 
 <p>
-Once the initial spec is defined, development starts. At this stage, multiple new ideas will come up, and hypotheses will be battle tested and concepts reshaped as the protocol begins to come to life and is interacted with. At this stage, every proposed change is fair game and should be considered.
+Once the initial spec is defined, development starts. At this stage, multiple new ideas will come up, hypotheses will be battle tested, and concepts reshaped as the protocol begins to come to life and is interacted with. At this stage, every proposed change is fair game and should be considered.
 </p>
 <p>
 The goal should be to have a concrete working version of the protocol and to finalize the spec with all the detailed functionality so it is (almost) set in stone for further stages. By set in stone, I mean that every part of the protocol (including a fully detailed rollout plan) is defined at the end of this stage. This is the stage where changes can happen. Since smart contract protocols are very high risk, they cannot launch with bugs on them. To mitigate that risk, testing on each of the features has to be thorough. If changes are done after the testing, then all that testing effort is wasted and needs to be re-done with the new set of changes.
@@ -159,7 +159,7 @@ Audits will take longer than expected and it is really hard to time the exact ti
 The development team should think about audits as an extra check on the protocol and not a guarantee that it works properly and safely. The core team is the one that knows the protocol best and it is ultimately responsible for ensuring its safety.
 </p>
 <p>
-The protocol will ideally get audited when there's a release candidate. Auditors will ask for a particular commit to be used as reference and the closer that commit is to the final version of the protocol, the more valuable the audit will be. While you audit there are several tasks the team can dedicate you:
+The protocol will ideally get audited when there's a release candidate. Auditors will ask for a particular commit to be used as reference and the closer that commit is to the final version of the protocol, the more valuable the audit will be. While you audit there are several tasks the team can dedicate to:
 </p>
 <ul>
   <li>
@@ -181,7 +181,7 @@ Launch
 </h3>
 <p>
 The launch should be done almost from muscle memory. All stages of the launch should have already been rehearsed and scripts written to automate them.
-Here you also set up the actual infrastructure for the protocol. Make sure you have good observability (logging, metrics, errors, etc) that is available to all relevant contributors).
+Here you also set up the actual infrastructure for the protocol. Make sure you have good observability (logging, metrics, errors, etc) that is available to all relevant contributors.
 </p>
 
 <h2>
@@ -200,7 +200,7 @@ Unit tests should simulate contract calls and check the desired state. These are
 Integration tests where an instance of the blockchain is run on the developer's machine, smart contracts are deployed and transactions/queries run to ensure the state is the correct one. At first, they should be pretty broad and should be done more as a warm-up for the team working on setting the testnet environment. Closer to the fine-tuning stage, there should be a meaningful integration test per important protocol "flow".
   </li>
   <li>
-Manual testing at the beginning stages (but ongoing and frequent by the whole team or at least one representative of each area). That's more oriented for the team to be "aware" internally of how the thing works. Detect use cases that we are missing, use cases that we defined previously that we should not have. The focus is to "shape" the product, not to find bugs (finding them is a side effect here).
+Manual testing at the beginning stages, but ongoing and frequent by the whole team or at least one representative of each area. Its purpose is for the team to be "aware" of how the protocol works. Detect use cases that we are missing, use cases that we defined previously that we should not have. The focus is to "shape" the product, not to find bugs (finding them is a side effect here).
   </li>
   <li>
 Manual testing at the end is dedicated only to finding issues/bugs, maybe with the involvement of a QA team. It is more expensive and tedious to do so it must be ensured that it is done when it matters and pays off the most.
