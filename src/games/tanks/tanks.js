@@ -1,6 +1,6 @@
-// NOTE: prod config, should only be used in prod builds
+// NOTE: dev config, should only be used in dev builds
 var Config = {
-    debug: false
+    debug: true
 };
 // SHADER MANAGEMENT
 function initShaderProgram(gl, shaders) {
@@ -51,6 +51,14 @@ function squareVertices(width, height, x, y) {
 // COLOR SHADER
 function colorShaderDrawRectangle(gl, colorShader, color, width, height, x, y) {
     var glLocations = colorShader.locations;
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorShader.buffers.aPosition);
+    gl.vertexAttribPointer(glLocations.aPosition, 2, // size: components per iteration
+    gl.FLOAT, // data type
+    false, // normalize
+    0, // stride: bytes between beggining of consecutive vetex attributes in buffer
+    0 // offset: where to start reading data from the buffer
+    );
+    gl.enableVertexAttribArray(glLocations.aPosition);
     // Set matices
     var matrixProjection = mat3.projection(gl.canvas.width, gl.canvas.height);
     var matrixChangeOrigin = mat3.translation(-width / 2, -height / 2);
@@ -212,7 +220,7 @@ function textureShaderGetTextureCoords(name) {
 }
 window.onload = function () {
     var sprite = new Image();
-    sprite.src = './tanks_sprite.png';
+    sprite.src = './sprite.png';
     sprite.onload = function () {
         run(sprite);
     };
@@ -405,7 +413,7 @@ function run(sprite) {
             id: entityIds.create()
         },
         // Enemies
-        enemySpawnCountdown: 3 * time.seconds,
+        enemySpawnCountdown: 1 * time.seconds,
         enemyColor: {
             r: 0.8,
             g: 0.2,
@@ -722,15 +730,6 @@ function run(sprite) {
         // ColorShader
         // Create and bind buffer to the position attribute
         gl.useProgram(colorShaderProgram);
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorShader.buffers.aPosition);
-        gl.vertexAttribPointer(colorShader.locations.aPosition, 2, // size: components per iteration
-        gl.FLOAT, // data type
-        false, // normalize
-        0, // stride: bytes between beggining of consecutive vetex attributes in buffer
-        0 // offset: where to start reading data from the buffer
-        );
-        // Enable vertex attribute
-        gl.enableVertexAttribArray(colorShader.locations.aPosition);
         // TODO(fede): optimize tile drawing:
         // * Just do a single pass through all the tiles.
         // Draw Base
@@ -936,8 +935,8 @@ function bulletCreate(tank) {
     tank.bullet = {
         vx: vx,
         vy: vy,
-        width: 10,
-        height: 10,
+        width: 5,
+        height: 5,
         position: {
             x: tank.position.x,
             y: tank.position.y
