@@ -1,6 +1,5 @@
-// NOTE: dev config, should only be used in dev builds
 var Config = {
-    debug: true
+    debug: false
 };
 // SHADER MANAGEMENT
 function initShaderProgram(gl, shaders) {
@@ -692,7 +691,10 @@ function run(sprite) {
                 break;
             }
             var enemyMovement = tankComputeMovementInDirection(Game, enemy.tank, dt);
+            console.log(enemy.tank);
+            console.log("Prev: ", enemy.tank.position);
             enemy.tank.position = enemyMovement.newPosition;
+            console.log("New: ", enemy.tank.position);
             if (enemyMovement.collisions.length > 0) {
                 var newIndex = Math.floor(Math.random() * 4);
                 enemy.nextDirection = pickRandomDirection();
@@ -812,13 +814,13 @@ function tankGetData(tankType) {
         playerNormal: {
             width: 35,
             height: 35,
-            defaultSpeed: 100,
+            defaultSpeed: 200,
             bulletSpeed: 800
         },
         enemyNormal: {
             width: 35,
             height: 35,
-            defaultSpeed: 100,
+            defaultSpeed: 200,
             bulletSpeed: 800
         }
     }[tankType];
@@ -849,8 +851,13 @@ function tankEstimateMovement(tank, dt) {
         dy -= Math.floor(tank.speed * dt / 1000);
     }
     else if (tank.direction === "down") {
+        console.log("goging down");
         dy += Math.floor(tank.speed * dt / 1000);
     }
+    console.log("speed ", tank.speed);
+    console.log("dt ", dt);
+    console.log("dx: ", dx);
+    console.log("dy: ", dy);
     return {
         x: dx,
         y: dy
@@ -860,6 +867,7 @@ function tankComputeMovementInDirection(Game, tank, dt) {
     var tankData = tankGetData(tank.tankType);
     var collisions = [];
     var movementEstimate = tankEstimateMovement(tank, dt);
+    console.log(movementEstimate);
     var newPosition = {
         x: tank.position.x + movementEstimate.x,
         y: tank.position.y + movementEstimate.y
